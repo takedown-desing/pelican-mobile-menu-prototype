@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="ru"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Pelican — предлагаемое мобильное меню</title>
+<link rel="stylesheet" href="https://pelicanflightschool.com/css/fonts.css">
+<link rel="stylesheet" href="https://pelicanflightschool.com/css/custom+added.css">
+<link rel="stylesheet" href="https://pelicanflightschool.com/css/default.css">
+<link rel="stylesheet" href="https://pelicanflightschool.com/css/pft-international.css?v=21">
+<style>
+  html,body{width:100%;overflow-x:hidden}
+  .rep{display:flex !important;position:relative;overflow:hidden;height:100vh}
+
+  :root{ --dark:#1C1C1C; --gold:#EBA044; --gold-l:#FBCF4D; --line:#e6e6e6; --muted:#6b6b6b; }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;padding:0}
+  body{background:#eef0f3;font-family:-apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:#1C1C1C}
+
+  .top{max-width:1060px;margin:0 auto;padding:22px 18px 8px}
+  .top h1{font-size:22px;margin:0 0 6px;font-family:-apple-system,"Segoe UI",Arial,sans-serif;font-weight:700}
+  .top p{margin:0 0 12px;color:var(--muted);font-size:14px;max-width:680px}
+  .sw{display:inline-flex;background:#fff;border:1px solid var(--line);border-radius:999px;padding:4px;gap:4px;flex-wrap:wrap}
+  .sw button{border:0;background:transparent;font:inherit;font-size:14px;font-weight:600;color:var(--muted);padding:9px 16px;border-radius:999px;cursor:pointer}
+  .sw button.on{background:var(--dark);color:#fff}
+  .note{max-width:1060px;margin:10px auto 0;padding:0 18px;font-size:13px;color:var(--muted)}
+  .note b{color:#1C1C1C}
+  .stage{display:flex;justify-content:center;padding:14px 18px 44px}
+  .phone{width:390px;height:800px;background:#fff;border-radius:36px;overflow:hidden;position:relative;
+    box-shadow:0 18px 50px rgba(0,0,0,.20);border:10px solid #111}
+  .screen{position:absolute;inset:0;overflow:hidden}
+  #live{width:100%;height:100%;border:0;display:block}
+  @media(max-width:560px){
+    .top{padding:14px 14px 6px} .top h1{font-size:18px}
+    .stage{padding:8px 0 22px}
+    .phone{width:100%;height:86vh;border-radius:0;border:0;box-shadow:none}
+  }
+
+  /* ---------- реплика сайта ---------- */
+  .rep{position:absolute;inset:0;display:none;flex-direction:column;background:#fff}
+  .rep.on{display:flex}
+  .rep-hd{flex:0 0 auto;background:#fff;border-bottom:1px solid var(--line);padding:8px 8px;
+    display:flex;align-items:center;gap:6px;position:relative;z-index:5}
+  .rep-hd .burger{width:44px;height:44px;border:0;background:transparent;display:flex;flex-direction:column;
+    justify-content:center;align-items:center;gap:5px;cursor:pointer;flex:0 0 44px}
+  .rep-hd .burger span{width:22px;height:2px;background:#1C1C1C;border-radius:2px;display:block}
+  .rep-hd .lg{flex:1 1 auto;display:flex;align-items:center;min-width:0}
+  .rep-hd .lg img{height:42px;width:auto;display:block}
+  .rep-hd .ic{width:40px;height:40px;border:0;background:transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;flex:0 0 40px;text-decoration:none}
+  .rep-body{flex:1 1 auto;overflow:auto;-webkit-overflow-scrolling:touch;padding:14px 12px 40px}
+  .rep-body h1{font-size:23px;margin:0 0 10px}
+  .rep-body h2{font-size:19px;margin:18px 0 8px}
+  .rep-body p{font-size:14.5px;line-height:1.5;color:#333;margin:0 0 12px}
+  .tbl-wrap{overflow-x:auto;margin:12px 0 18px;-webkit-overflow-scrolling:touch}
+
+  /* ---------- новое меню ---------- */
+  .ov{position:absolute;inset:0;background:rgba(0,0,0,.45);opacity:0;pointer-events:none;transition:opacity .22s;z-index:20}
+  .ov.on{opacity:1;pointer-events:auto}
+  .nav{position:absolute;top:0;right:0;height:100%;width:100%;max-width:400px;background:#fff;z-index:21;
+    transform:translateX(100%);transition:transform .26s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column}
+  .nav.open{transform:translateX(0)}
+  @media(max-width:560px){ .nav{max-width:none} }
+  .nav-hd{flex:0 0 auto;background:var(--dark);display:flex;align-items:center;justify-content:space-between;padding:8px 6px 8px 12px}
+  .nav-hd img{height:40px;width:auto;display:block}
+  .nav-x{width:48px;height:48px;border:0;background:transparent;color:#fff;font-size:28px;line-height:1;cursor:pointer;border-radius:10px}
+  .nav-sc{flex:1 1 auto;overflow:auto;-webkit-overflow-scrolling:touch}
+
+  .srch{padding:12px 14px 4px}
+  .srch input{width:100%;height:46px;border:1px solid var(--line);border-radius:8px;padding:0 14px;font-size:16px;background:#fafafa;font-family:inherit}
+  .srch input:focus{outline:2px solid var(--gold);background:#fff}
+  .quick{display:flex;gap:8px;padding:10px 14px 12px}
+  .quick a{flex:1;height:50px;border-radius:8px;display:flex;align-items:center;justify-content:center;
+    font-size:15px;font-weight:700;text-decoration:none}
+  .q1{background:var(--gold-l);color:var(--dark)}
+  .q2{background:#25D366;color:#fff}
+
+  .gt{font-size:11px;letter-spacing:1.1px;text-transform:uppercase;color:var(--muted);padding:14px 14px 6px;font-weight:700}
+  .pri{padding:0 14px 4px;display:grid;gap:8px}
+  .pri a{display:block;min-height:58px;border:1px solid var(--line);border-radius:8px;
+    padding:11px 12px;text-decoration:none;color:#1C1C1C;border-left:3px solid var(--gold)}
+  .pri b{display:block;font-size:15px;line-height:1.25}
+  .pri i{display:block;font-size:12.5px;color:var(--muted);font-style:normal;margin-top:2px}
+
+  .acc{margin-top:10px;border-top:1px solid var(--line)}
+  .ai{border-bottom:1px solid var(--line)}
+  .ab{width:100%;min-height:54px;background:#fff;border:0;display:flex;align-items:center;justify-content:space-between;
+    padding:8px 14px;font:inherit;font-size:16px;font-weight:600;color:#1C1C1C;cursor:pointer;text-align:left;gap:10px}
+  .ab .cv{flex:0 0 auto;transition:transform .2s;color:var(--muted);font-size:12px}
+  .ai.open .ab{color:var(--gold)}
+  .ai.open .cv{transform:rotate(180deg);color:var(--gold)}
+  .ap{max-height:0;overflow:hidden;transition:max-height .28s ease;background:#fafafa}
+  .ai.open .ap{max-height:900px}
+  .ap a{display:block;min-height:48px;line-height:1.35;padding:13px 14px 13px 26px;font-size:15px;color:#333;
+    text-decoration:none;border-top:1px solid #efefef}
+  .ap a.cur{color:var(--gold);font-weight:700;box-shadow:inset 3px 0 0 var(--gold);background:#fffdf8}
+  .solo{display:flex;align-items:center;min-height:54px;padding:0 14px;font-size:16px;font-weight:600;color:#1C1C1C;
+    text-decoration:none;border-bottom:1px solid var(--line)}
+  .nav-ft{flex:0 0 auto;border-top:1px solid var(--line);padding:12px 14px calc(14px + env(safe-area-inset-bottom));background:#fff}
+  .nav-ft a{display:flex;align-items:center;min-height:44px;font-size:15px;color:#1C1C1C;text-decoration:none;font-weight:700}
+  .nav-ft div{color:var(--muted);font-size:12.5px;padding-top:2px;line-height:1.4}
+
+  .hint{max-width:1060px;margin:0 auto 34px;padding:0 18px}
+  .hint div{background:#fff;border:1px solid var(--line);border-left:4px solid var(--gold);border-radius:8px;padding:13px 15px;font-size:13.5px;color:#444;line-height:1.55}
+  .hint b{color:#1C1C1C}
+</style>
+</head><body>
+<div class="rep" id="rep">
+      <div class="rep-hd">
+        <button class="burger" onclick="openMenu()" aria-label="Открыть меню"><span></span><span></span><span></span></button>
+        <a class="lg" href="https://pelicanflightschool.com/" target="_blank"><img src="https://pelicanflightschool.com/images/photo_2024-09-26%2022.55.47.jpeg" alt="Pelican Flight Training"></a>
+        <button class="ic" aria-label="Поиск"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="#1C1C1C" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
+        <a class="ic" href="https://wa.me/13058779069" target="_blank" aria-label="WhatsApp"><svg xmlns="http://www.w3.org/2000/svg" width="21" height="21" viewBox="0 0 32 32" fill="#25D366"><path d="M16 .395C7.163.395 0 7.559 0 16.395c0 2.89.75 5.74 2.18 8.264L.14 31.605l7.162-2.02A15.926 15.926 0 0 0 16 32c8.837 0 16-7.164 16-16.005S24.837.395 16 .395Zm0 29.01a13.04 13.04 0 0 1-6.63-1.785l-.472-.272-4.25 1.197 1.14-4.12-.31-.49a13.008 13.008 0 1 1 10.522 5.47Z"/></svg></a>
+      </div>
+
+      <div class="rep-body inner-pages-style">
+        <h1>Pilot Training Programs and Courses</h1>
+        <p>Pelican Flight Training offers 17 FAA approved programs in 2026, for airplanes and helicopters, from a first discovery flight to a full professional pilot diploma.</p>
+
+        <h2 id="airplane-programs">Airplane Individual Programs</h2>
+        <div class="tbl-wrap">
+        <table class="pft-pricing-table">
+          <thead><tr><th>Program</th><th>Price USD</th><th>Duration</th><th>Best for</th></tr></thead>
+          <tbody>
+            <tr><td><a href="#">Airplane Private Pilot Certification (PPL)</a></td><td>$14,155 (C152) / $15,702 (C172)</td><td>3-5 months</td><td>Recreational pilots, first license</td></tr>
+            <tr><td><a href="#">Instrument Pilot Rating (IR)</a></td><td>$14,653</td><td>3-4 months</td><td>PPL holders adding instrument capability</td></tr>
+            <tr><td><a href="#">Commercial Pilot Certification (CPL)</a></td><td>$58,782 (includes IR if not held)</td><td>9-12 months</td><td>PPL holders pursuing commercial career</td></tr>
+            <tr><td><a href="#">Multi-Engine Pilot Certification (MEL)</a></td><td>$6,380</td><td>2-4 weeks</td><td>CPL holders preparing for regional airline employment</td></tr>
+            <tr><td><a href="#">Airplane Program for PPL Holders</a></td><td>Customized</td><td>9-14 months</td><td>Pilots with foreign PPL adding ratings</td></tr>
+          </tbody>
+        </table>
+        </div>
+
+        <h2 id="helicopter-programs">Helicopter Programs</h2>
+        <p>Pelican is one of only four FAA Part 141 helicopter accredited schools in the United States. Full helicopter pathway available:</p>
+        <div class="tbl-wrap">
+        <table class="pft-pricing-table">
+          <thead><tr><th>Program</th><th>Price USD</th><th>Best for</th></tr></thead>
+          <tbody>
+            <tr><td><a href="#">Helicopter Private Pilot Certification (PPL-H)</a></td><td>$18,950</td><td>First helicopter license</td></tr>
+            <tr><td><a href="#">Helicopter Instrument Rating (IR-H)</a></td><td>$16,300</td><td>PPL-H holders adding instrument capability</td></tr>
+            <tr><td><a href="#">Helicopter Commercial Pilot License (CPL-H)</a></td><td>$26,359</td><td>PPL-H holders pursuing commercial career</td></tr>
+          </tbody>
+        </table>
+        </div>
+      </div>
+
+      <div class="ov" id="ov" onclick="closeMenu()"></div>
+      <aside class="nav" id="nav" role="dialog" aria-modal="true" aria-label="Главное меню">
+        <div class="nav-hd">
+          <img src="https://pelicanflightschool.com/images/photo_2024-09-26%2022.55.47.jpeg" alt="Pelican Flight Training">
+          <button class="nav-x" onclick="closeMenu()" aria-label="Закрыть меню">&times;</button>
+        </div>
+        <div class="nav-sc">
+          <div class="srch"><input type="search" placeholder="Find the information" aria-label="Поиск по сайту"></div>
+          <div class="quick">
+            <a class="q1" href="https://pelicanflightschool.com/apply-now" target="_blank">Apply Now</a>
+            <a class="q2" href="https://wa.me/13058779069" target="_blank">WhatsApp</a>
+          </div>
+          <div class="gt">Популярное</div>
+          <div class="pri">
+            <a href="https://pelicanflightschool.com/programs-courses/" target="_blank"><b>Programs &amp; Courses</b><i>17 программ и цены</i></a>
+            <a href="https://pelicanflightschool.com/helicopter-pilot-training" target="_blank"><b>Helicopter Training</b><i>Part 141, одна из 4 школ в США</i></a>
+            <a href="https://pelicanflightschool.com/international-students" target="_blank"><b>International Students</b><i>Виза F-1 и поддержка</i></a>
+          </div>
+          <div class="gt">Все разделы</div>
+          <div class="acc" id="acc"></div>
+        </div>
+        <div class="nav-ft">
+          <a href="tel:+19549669750">+1 (954) 966-9750</a>
+          <div>1601 SW 75th Ave, Pembroke Pines, FL 33023<br>North Perry Airport (KHWO)</div>
+        </div>
+      </aside>
+    
+<script>
+/* Полная структура меню, выгружена с живого сайта 11.09.2026: 7 разделов, 30 подпунктов */
+var MENU=[
+ {t:"About",subs:[["About Us","about-us"],["Pelican History","pelican-history"],["Our Team","our-team"],["Our Training Fleet: Aircraft, Helicopters and Simulator","aircrafts"],["Our Alumni's","our-graduates"],["Accreditation","accreditation"],["Reviews","reviews"]]},
+ {t:"Admissions",subs:[["Flight School Admissions","admissions"],["Transfer to Pelican From Another Flight School","transfer-flight-school"],["International Students","international-students"],["Pilot Demand","pilot-demand"],["Minimum Requirements","requirements"],["U.S. Students","u.s.-students"]]},
+ {t:"Training",subs:[["Pilot Training","flight-training"],["How to Become a Commercial Pilot?","how-to-become-a-commercial-pilot"],["Programs & Courses","programs-courses/"]]},
+ {t:"For students",subs:[["Student Info","student-information"],["Student Services","student-service"],["Location","location"],["Student Life","student-life"],["Online Scheduling","online-scheduling"],["Useful Links","useful-links"],["Student Accommodation","accomodations"]]},
+ {t:"Contact Us",href:"contact",subs:[]},
+ {t:"Login",subs:[["Online Scheduling","https://pelican.paperlessfbo.com/FCMS1.aspx?MSG=1"]]},
+ {t:"Blog",subs:[["Articles","blog/articles/"],["News","blog/news/"],["FAQ","faq"]]}
+];
+var BASE="https://pelicanflightschool.com/";
+var acc=document.getElementById('acc');
+MENU.forEach(function(m){
+  if(!m.subs.length){
+    var a=document.createElement('a'); a.className='solo'; a.href=BASE+(m.href||''); a.target='_blank'; a.textContent=m.t; acc.appendChild(a); return;
+  }
+  var d=document.createElement('div'); d.className='ai';
+  var id='p'+m.t.replace(/\W/g,'');
+  d.innerHTML='<button class="ab" aria-expanded="false" aria-controls="'+id+'">'+m.t+'<span class="cv">&#9660;</span></button>'
+   +'<div class="ap" id="'+id+'">'+m.subs.map(function(s){
+      var href=s[1].indexOf('http')===0?s[1]:BASE+s[1];
+      var cur=s[1]==='programs-courses/'?' class="cur"':'';
+      return '<a href="'+href+'" target="_blank"'+cur+'>'+s[0]+'</a>';
+   }).join('')+'</div>';
+  d.querySelector('.ab').addEventListener('click',function(){
+    var o=d.classList.toggle('open'); this.setAttribute('aria-expanded',o?'true':'false');
+  });
+  acc.appendChild(d);
+});
+
+var mode='new';
+function openMenu(){ document.getElementById('nav').classList.add('open'); document.getElementById('ov').classList.add('on'); }
+function closeMenu(){ var n=document.getElementById('nav'), o=document.getElementById('ov'); if(n) n.classList.remove('open'); if(o) o.classList.remove('on'); }
+document.addEventListener('keydown',function(e){ if(e.key==='Escape') closeMenu(); });
+
+(function(){ if((location.hash||'').toLowerCase().indexOf('open')>-1) setTimeout(openMenu,200); })();
+</script>
+</body></html>

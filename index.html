@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Pelican Flight Training — прототип мобильного меню</title>
+<style>
+  :root{
+    --dark:#1C1C1C; --gold:#EBA044; --gold-l:#FBCF4D; --line:#e9e9e9;
+    --txt:#1C1C1C; --muted:#6b6b6b; --bg:#f4f5f7;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent}
+  html,body{margin:0;padding:0}
+  body{font-family:-apple-system,"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);color:var(--txt);line-height:1.45}
+
+  /* ---------- обвязка демо ---------- */
+  .demo-top{max-width:980px;margin:0 auto;padding:26px 18px 10px}
+  .demo-top h1{font-size:23px;margin:0 0 6px}
+  .demo-top p{margin:0 0 14px;color:var(--muted);font-size:14px;max-width:640px}
+  .switch{display:inline-flex;background:#fff;border:1px solid var(--line);border-radius:999px;padding:4px;gap:4px;margin-bottom:6px}
+  .switch button{border:0;background:transparent;font:inherit;font-size:14px;font-weight:600;color:var(--muted);
+    padding:9px 18px;border-radius:999px;cursor:pointer}
+  .switch button.on{background:var(--dark);color:#fff}
+  .note{max-width:980px;margin:0 auto;padding:0 18px 16px;font-size:13px;color:var(--muted)}
+  .note b{color:var(--txt)}
+
+  /* ---------- рамка телефона ---------- */
+  .stage{display:flex;justify-content:center;padding:8px 18px 50px}
+  .phone{width:390px;height:780px;background:#fff;border-radius:34px;overflow:hidden;position:relative;
+    box-shadow:0 18px 50px rgba(0,0,0,.18);border:9px solid #111}
+  @media(max-width:560px){
+    .demo-top{padding:16px 14px 8px} .demo-top h1{font-size:19px}
+    .stage{padding:6px 0 26px}
+    .phone{width:100%;height:88vh;border-radius:0;border:0;box-shadow:none}
+    .nav{max-width:none}          /* на телефоне меню занимает экран целиком */
+  }
+  .screen{position:absolute;inset:0;overflow:hidden}
+
+  /* ---------- шапка сайта (общая) ---------- */
+  .site-hd{height:62px;background:var(--dark);display:flex;align-items:center;justify-content:space-between;
+    padding:0 14px;position:relative;z-index:5}
+  .site-hd .logo{color:#fff;font-weight:800;letter-spacing:.5px;font-size:15px;display:flex;align-items:center;gap:7px}
+  .site-hd .logo i{width:9px;height:9px;background:var(--gold);border-radius:50%;display:block}
+  .burger{width:46px;height:46px;border:0;background:transparent;display:flex;flex-direction:column;
+    justify-content:center;align-items:center;gap:5px;cursor:pointer}
+  .burger span{width:23px;height:2px;background:#fff;display:block;border-radius:2px}
+
+  /* ---------- контент страницы (макет) ---------- */
+  .page{padding:16px 14px 40px;height:calc(100% - 62px);overflow:auto}
+  .page h2{font-size:19px;margin:4px 0 10px}
+  .page p{font-size:14px;color:#444;margin:0 0 12px}
+  .card{border:1px solid var(--line);border-radius:10px;padding:12px;margin-bottom:10px;background:#fff}
+  .card b{display:block;font-size:14px;margin-bottom:3px}
+  .card span{font-size:13px;color:var(--muted)}
+
+  /* ================= ВАРИАНТ «КАК СЕЙЧАС» ================= */
+  .old-panel{position:absolute;top:62px;right:0;width:206px;background:#fff;height:calc(100% - 62px);
+    z-index:8;overflow:auto;border-left:1px solid var(--line);transform:translateX(100%);transition:transform .25s}
+  .old-panel.open{transform:translateX(0)}
+  .old-panel .x{position:absolute;left:-26px;top:8px;width:34px;height:34px;background:#fff;transform:rotate(45deg);
+    border:1px solid var(--line);display:flex;align-items:center;justify-content:center}
+  .old-panel .x b{transform:rotate(-45deg);font-size:13px}
+  .old-list{padding:10px 0 0 22px}
+  .old-list > li{list-style:none;margin:0 0 2px}
+  .old-row{display:flex;align-items:flex-start;justify-content:space-between;gap:4px;
+    width:102px;                 /* измерено на живом сайте */
+    font-size:12px;              /* измерено */
+    line-height:26px;            /* измерено: высота строки 26px */
+    font-weight:700;word-break:break-all;cursor:pointer}
+  .old-sub{padding:0 0 6px 12px}
+  .old-sub li{list-style:none;font-size:11px;line-height:1.25;width:78px;word-break:break-all;color:#333;
+    margin:0 0 8px;position:relative;padding-left:10px}
+  .old-sub li:before{content:"";position:absolute;left:0;top:5px;width:5px;height:5px;border-radius:50%;background:#3aa3ff}
+  .old-panel ul{margin:0;padding:0}
+
+  /* ================= ВАРИАНТ «КАК ПРЕДЛАГАЕМ» ================= */
+  .ov{position:absolute;inset:0;background:rgba(0,0,0,.45);opacity:0;pointer-events:none;transition:opacity .22s;z-index:9}
+  .ov.on{opacity:1;pointer-events:auto}
+  .nav{position:absolute;top:0;right:0;height:100%;width:100%;max-width:400px;background:#fff;z-index:10;
+    transform:translateX(100%);transition:transform .26s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column}
+  .nav.open{transform:translateX(0)}
+  .nav-hd{height:62px;background:var(--dark);display:flex;align-items:center;justify-content:space-between;padding:0 8px 0 14px;flex:0 0 auto}
+  .nav-hd .logo{color:#fff;font-weight:800;font-size:15px;display:flex;align-items:center;gap:7px}
+  .nav-hd .logo i{width:9px;height:9px;background:var(--gold);border-radius:50%}
+  .close{width:48px;height:48px;border:0;background:transparent;color:#fff;font-size:27px;line-height:1;cursor:pointer;border-radius:10px}
+  .nav-scroll{flex:1 1 auto;overflow:auto;-webkit-overflow-scrolling:touch}
+
+  .srch{padding:12px 14px 6px}
+  .srch input{width:100%;height:46px;border:1px solid var(--line);border-radius:10px;padding:0 14px;font-size:16px;background:#fafafa}
+  .srch input:focus{outline:2px solid var(--gold);background:#fff}
+
+  .quick{display:flex;gap:8px;padding:8px 14px 12px}
+  .quick a{flex:1;height:50px;border-radius:10px;display:flex;align-items:center;justify-content:center;gap:7px;
+    font-size:15px;font-weight:700;text-decoration:none}
+  .q-apply{background:var(--gold-l);color:var(--dark)}
+  .q-call{background:var(--dark);color:#fff}
+
+  .grp-t{font-size:11px;letter-spacing:1.1px;text-transform:uppercase;color:var(--muted);padding:12px 14px 5px;font-weight:700}
+  .pri{padding:0 14px 6px;display:grid;grid-template-columns:1fr;gap:8px}
+  .pri a{display:flex;align-items:center;gap:11px;min-height:56px;border:1px solid var(--line);border-radius:10px;
+    padding:9px 13px;text-decoration:none;color:var(--txt)}
+  .pri a:active{background:#fdf7ea}
+  .pri .ic{width:34px;height:34px;border-radius:9px;background:#fdf7ea;color:var(--gold);display:flex;align-items:center;
+    justify-content:center;flex:0 0 34px}
+  .pri b{display:block;font-size:15px;line-height:1.2}
+  .pri span{display:block;font-size:12.5px;color:var(--muted)}
+
+  .acc{border-top:1px solid var(--line);margin-top:8px}
+  .acc-i{border-bottom:1px solid var(--line)}
+  .acc-b{width:100%;min-height:54px;background:#fff;border:0;display:flex;align-items:center;justify-content:space-between;
+    padding:0 14px;font:inherit;font-size:16px;font-weight:600;color:var(--txt);cursor:pointer;text-align:left;gap:10px}
+  .acc-b .chev{flex:0 0 auto;transition:transform .2s;color:var(--muted);font-size:13px}
+  .acc-i.open .acc-b{color:var(--gold)}
+  .acc-i.open .chev{transform:rotate(180deg);color:var(--gold)}
+  .acc-p{max-height:0;overflow:hidden;transition:max-height .26s ease;background:#fafafa}
+  .acc-i.open .acc-p{max-height:620px}
+  .acc-p a{display:block;min-height:48px;line-height:1.3;padding:13px 14px 13px 26px;font-size:15px;color:#333;
+    text-decoration:none;border-top:1px solid #efefef}
+  .acc-p a:active{background:#fdf7ea;color:var(--dark)}
+  .acc-p a.cur{color:var(--gold);font-weight:700;box-shadow:inset 3px 0 0 var(--gold)}
+  .solo{display:flex;align-items:center;min-height:54px;padding:0 14px;font-size:16px;font-weight:600;
+    color:var(--txt);text-decoration:none;border-bottom:1px solid var(--line)}
+
+  .nav-ft{flex:0 0 auto;border-top:1px solid var(--line);padding:12px 14px calc(14px + env(safe-area-inset-bottom));background:#fff}
+  .nav-ft a{display:flex;align-items:center;gap:9px;min-height:44px;font-size:14.5px;color:var(--txt);text-decoration:none}
+  .nav-ft .muted{color:var(--muted);font-size:12.5px;padding-top:4px}
+
+  .hint{max-width:980px;margin:0 auto 30px;padding:0 18px}
+  .hint div{background:#fff;border:1px solid var(--line);border-left:4px solid var(--gold);border-radius:8px;
+    padding:12px 15px;font-size:13.5px;color:#444}
+  .hint b{color:var(--txt)}
+</style>
+</head>
+<body>
+
+<div class="demo-top">
+  <h1>Мобильное меню Pelican: что не так и как предлагаем сделать</h1>
+  <p>Переключите режим и нажмите кнопку меню в чёрной шапке телефона. Прототип рабочий, его можно открыть на своём телефоне.</p>
+  <div class="switch">
+    <button id="bOld" onclick="setMode('old')">Как сейчас</button>
+    <button id="bNew" class="on" onclick="setMode('new')">Как предлагаем</button>
+  </div>
+</div>
+
+<div class="note" id="note"></div>
+
+<div class="stage">
+  <div class="phone">
+    <div class="screen">
+
+      <div class="site-hd">
+        <div class="logo"><i></i>PELICAN</div>
+        <button class="burger" onclick="openMenu()" aria-label="Открыть меню"><span></span><span></span><span></span></button>
+      </div>
+
+      <div class="page">
+        <h2>Airplane Individual Programs</h2>
+        <p>Страница программ, на которой заказчик и заметил проблему.</p>
+        <div class="card"><b>Private Pilot (PPL)</b><span>$14,155 / $15,702 &middot; 3-5 months</span></div>
+        <div class="card"><b>Instrument Rating (IR)</b><span>$14,653 &middot; 3-4 months</span></div>
+        <div class="card"><b>Commercial Pilot (CPL)</b><span>$58,782 &middot; 9-12 months</span></div>
+        <div class="card"><b>Multi-Engine</b><span>$6,380 &middot; 2-4 weeks</span></div>
+      </div>
+
+      <!-- ===== КАК СЕЙЧАС ===== -->
+      <div class="old-panel" id="oldPanel">
+        <div class="x" onclick="closeMenu()"><b>X</b></div>
+        <ul class="old-list" id="oldList"></ul>
+      </div>
+
+      <!-- ===== КАК ПРЕДЛАГАЕМ ===== -->
+      <div class="ov" id="ov" onclick="closeMenu()"></div>
+      <aside class="nav" id="nav" role="dialog" aria-modal="true" aria-label="Главное меню">
+        <div class="nav-hd">
+          <div class="logo"><i></i>PELICAN</div>
+          <button class="close" onclick="closeMenu()" aria-label="Закрыть меню">&times;</button>
+        </div>
+        <div class="nav-scroll">
+          <div class="srch"><input type="search" placeholder="Поиск по сайту" aria-label="Поиск"></div>
+          <div class="quick">
+            <a class="q-apply" href="#">Apply Now</a>
+            <a class="q-call" href="#">Позвонить</a>
+          </div>
+          <div class="grp-t">Популярное</div>
+          <div class="pri">
+            <a href="#"><span class="ic">&#9992;</span><span><b>Programs &amp; Courses</b><span>Все программы и цены</span></span></a>
+            <a href="#"><span class="ic">&#9784;</span><span><b>Helicopter Training</b><span>Наше сильное направление</span></span></a>
+            <a href="#"><span class="ic">&#9733;</span><span><b>International Students</b><span>Виза F-1, поддержка</span></span></a>
+          </div>
+          <div class="grp-t">Разделы</div>
+          <div class="acc" id="acc"></div>
+        </div>
+        <div class="nav-ft">
+          <a href="#">&#9742; +1 (954) 966-9750</a>
+          <div class="muted">1601 SW 75th Ave, Pembroke Pines, FL &middot; North Perry Airport</div>
+        </div>
+      </aside>
+
+    </div>
+  </div>
+</div>
+
+<div class="hint"><div id="hint"></div></div>
+
+<script>
+/* Реальная структура меню, выгружена с сайта 11.09.2026 */
+const MENU = [
+  {t:"About", subs:["About Us","Pelican History","Our Team","Our Training Fleet","Our Alumni's","Accreditation","Reviews"]},
+  {t:"Admissions", subs:["Flight School Admissions","Transfer From Another Flight School","International Students","Pilot Demand","Minimum Requirements","U.S. Students"]},
+  {t:"Training", subs:["Pilot Training","How to Become a Commercial Pilot?","Programs & Courses"]},
+  {t:"For students", subs:["Student Info","Student Services","Location","Student Life","Online Scheduling","Useful Links","Student Accommodation"]},
+  {t:"Contact Us", subs:[]},
+  {t:"Login", subs:["Online Scheduling"]},
+  {t:"Blog", subs:["Articles","News","FAQ"]}
+];
+
+/* ---- рендер «как сейчас»: те же пункты, но в 102px колонке и 12px шрифтом ---- */
+const oldList = document.getElementById('oldList');
+MENU.forEach((m,i)=>{
+  const li=document.createElement('li');
+  li.innerHTML = '<div class="old-row" onclick="this.parentNode.querySelector(\'ul\')&&this.parentNode.querySelector(\'ul\').classList.toggle(\'hid\')">'
+    + m.t + (m.subs.length?'<span>&#9662;</span>':'') + '</div>';
+  if(m.subs.length && i===2){ // Training раскрыт, как на скриншоте заказчика
+    const ul=document.createElement('ul'); ul.className='old-sub';
+    m.subs.forEach(s=>{ const l=document.createElement('li'); l.textContent=s; ul.appendChild(l); });
+    li.appendChild(ul);
+  }
+  oldList.appendChild(li);
+});
+
+/* ---- рендер «как предлагаем»: аккордеон ---- */
+const acc = document.getElementById('acc');
+MENU.forEach(m=>{
+  if(!m.subs.length){
+    const a=document.createElement('a'); a.className='solo'; a.href='#'; a.textContent=m.t; acc.appendChild(a); return;
+  }
+  const d=document.createElement('div'); d.className='acc-i';
+  const id='p-'+m.t.replace(/\W/g,'');
+  d.innerHTML='<button class="acc-b" aria-expanded="false" aria-controls="'+id+'">'+m.t+'<span class="chev">&#9660;</span></button>'
+    +'<div class="acc-p" id="'+id+'">'+m.subs.map(s=>'<a href="#"'+(s==='Programs & Courses'?' class="cur"':'')+'>'+s+'</a>').join('')+'</div>';
+  d.querySelector('.acc-b').addEventListener('click',function(){
+    const open=d.classList.toggle('open');
+    this.setAttribute('aria-expanded', open?'true':'false');
+  });
+  acc.appendChild(d);
+});
+
+/* ---- режимы и управление ---- */
+let mode='new';
+function setMode(m){
+  mode=m; closeMenu();
+  document.getElementById('bOld').classList.toggle('on', m==='old');
+  document.getElementById('bNew').classList.toggle('on', m==='new');
+  document.getElementById('note').innerHTML = m==='old'
+    ? 'Так работает сейчас. Цифры не выдуманы, они сняты с живого сайта на экране 390px: панель меню <b>206px</b>, сама ссылка внутри <b>102px</b>, шрифт <b>12px</b>, высота строки <b>26px</b>. Поэтому слова рвутся по буквам.'
+    : 'Так предлагаем. Меню на всю ширину, шрифт 16px, высота строки 54px, подпункты 48px. Сверху поиск и две главные кнопки, ниже популярные страницы, затем разделы аккордеоном.';
+  document.getElementById('hint').innerHTML = m==='old'
+    ? '<b>Что именно ломается.</b> Ширина ссылки 102px меньше, чем слово Admissions, поэтому браузер рвёт его на Admissi и ons. У подпунктов ширина ещё меньше, и How to Become a Commercial Pilot превращается в лесенку из слогов. Высота строки 26px вместо рекомендованных 44px, попасть пальцем тяжело.'
+    : '<b>Что изменилось по сути.</b> Меню перестало быть колонкой и занимает экран целиком, поэтому переносов по буквам нет в принципе. Добавлены поиск и кнопки Apply Now и Позвонить, которых в мобильном меню не было вообще. Наверх вынесены три страницы, которые приносят заявки, чтобы до них не надо было копать через два уровня. Закрытие работает тремя способами: крестик, тап по затемнению и клавиша Esc.';
+}
+function openMenu(){
+  if(mode==='old'){ document.getElementById('oldPanel').classList.add('open'); }
+  else { document.getElementById('nav').classList.add('open'); document.getElementById('ov').classList.add('on'); }
+  document.querySelector('.page').style.overflow='hidden';
+}
+function closeMenu(){
+  document.getElementById('oldPanel').classList.remove('open');
+  document.getElementById('nav').classList.remove('open');
+  document.getElementById('ov').classList.remove('on');
+  document.querySelector('.page').style.overflow='auto';
+}
+document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeMenu(); });
+setMode('new');
+/* прямые ссылки: #open открывает меню, #old показывает текущий вариант */
+(function(){
+  const h=(location.hash||'').toLowerCase();
+  if(h.indexOf('old')>-1) setMode('old');
+  if(h.indexOf('open')>-1) setTimeout(openMenu,120);
+})();
+</script>
+</body>
+</html>

@@ -34,6 +34,22 @@
   .hint b{color:#1C1C1C}
   .open-new{max-width:1060px;margin:0 auto 26px;padding:0 18px;font-size:13px}
   .open-new a{color:#1C1C1C}
+  .spec{max-width:1060px;margin:0 auto 46px;padding:20px 18px;background:#fff;border:1px solid var(--line);border-radius:10px}
+  .spec h2{font-size:19px;margin:0 0 10px}
+  .spec h3{font-size:15px;margin:20px 0 7px}
+  .spec p{font-size:14px;color:#333;margin:0 0 10px}
+  .spec .lead{background:#fdf7ea;border-left:4px solid var(--gold);padding:10px 13px;border-radius:6px}
+  .spec .sm{font-size:13px;color:var(--muted)}
+  .spec ul{margin:0 0 10px;padding-left:19px;font-size:14px;color:#333}
+  .spec li{margin:4px 0}
+  .spec table.t{width:100%;border-collapse:collapse;margin:8px 0 12px;font-size:13.5px}
+  .spec table.t th{background:#1C1C1C;color:#fff;text-align:left;padding:8px 10px;font-weight:600}
+  .spec table.t td{padding:8px 10px;border-bottom:1px solid #eee}
+  .spec table.t tr:nth-child(even) td{background:#faf7f1}
+  .spec code{background:#f3f3f3;padding:1px 5px;border-radius:4px;font-size:13px}
+  .spec pre{background:#1C1C1C;color:#eee;padding:13px 15px;border-radius:8px;overflow-x:auto;font-size:12.5px;line-height:1.55}
+  .spec pre code{background:transparent;color:inherit;padding:0}
+
 </style>
 </head>
 <body>
@@ -56,6 +72,66 @@
 </div>
 
 <div class="hint"><div id="hint"></div></div>
+
+<div class="spec">
+  <h2>Блок Popular: что именно ставить, инструкция разработчику</h2>
+
+  <p class="lead">Блок <b>не динамический</b>. Это три жёстко прописанные ссылки в шаблоне. Разработчику ничего не надо считать, выгружать или определять самому: список ниже готов, его нужно просто вставить как есть.</p>
+
+  <h3>Что вставить</h3>
+  <table class="t">
+    <thead><tr><th>Ссылка</th><th>Заголовок</th><th>Подпись под заголовком</th></tr></thead>
+    <tbody>
+      <tr><td><code>/programs-courses/</code></td><td>Programs &amp; Courses</td><td>All 17 programs with prices</td></tr>
+      <tr><td><code>/helicopter-pilot-training</code></td><td>Helicopter Training</td><td>FAA Part 141, one of four in the USA</td></tr>
+      <tr><td><code>/international-students</code></td><td>International Students</td><td>F-1 visa and full support</td></tr>
+    </tbody>
+  </table>
+  <p class="sm">Внимание: у адреса <code>/programs-courses/</code> слеш в конце обязателен, без него сайт отдаёт редирект. У двух других страниц слеша на конце быть не должно.</p>
+
+  <h3>Готовый код</h3>
+<pre><code>&lt;div class="gt"&gt;Popular&lt;/div&gt;
+&lt;div class="pri"&gt;
+  &lt;a href="/programs-courses/"&gt;&lt;b&gt;Programs &amp;amp; Courses&lt;/b&gt;&lt;i&gt;All 17 programs with prices&lt;/i&gt;&lt;/a&gt;
+  &lt;a href="/helicopter-pilot-training"&gt;&lt;b&gt;Helicopter Training&lt;/b&gt;&lt;i&gt;FAA Part 141, one of four in the USA&lt;/i&gt;&lt;/a&gt;
+  &lt;a href="/international-students"&gt;&lt;b&gt;International Students&lt;/b&gt;&lt;i&gt;F-1 visa and full support&lt;/i&gt;&lt;/a&gt;
+&lt;/div&gt;</code></pre>
+
+  <h3>Правила блока</h3>
+  <ul>
+    <li>Всегда ровно <b>три</b> ссылки, не больше и не меньше. Четвёртая ломает смысл блока: он существует, чтобы сократить путь, а не стать вторым меню.</li>
+    <li>Ссылки ведут только на <b>страницы услуг</b>, не на статьи блога и не на языковые версии сайта.</li>
+    <li>Порядок в списке фиксированный, он задан выше.</li>
+    <li>Подписи короткие, до 45 символов, иначе на узком экране они уходят в две строки и блок распухает.</li>
+    <li>Блок стоит выше раздела All sections и ниже кнопок Apply Now и WhatsApp. Это место не меняется.</li>
+  </ul>
+
+  <h3>Кто и когда меняет состав</h3>
+  <p>Состав пересматривает SEO раз в квартал по данным Search Console и передаёт разработчику новый список в таком же виде: адрес, заголовок, подпись. <b>Разработчик сам состав не меняет и данные не смотрит.</b> Если задача звучит как «обнови популярное», значит к ней должен прилагаться готовый список из трёх строк, иначе задачу брать в работу нельзя.</p>
+
+  <h3>Почему выбраны именно эти три</h3>
+  <p>Обоснование нужно для обсуждения с клиентом, разработчику оно для работы не требуется. Отбор сделан по кликам из Search Console за 90 дней, с 14.06 по 12.09.2026, среди страниц услуг (статьи блога и языковые зеркала исключены):</p>
+  <table class="t">
+    <thead><tr><th>Страница</th><th>Клики</th><th>Показы</th><th>Позиция</th></tr></thead>
+    <tbody>
+      <tr><td>international-students</td><td>288</td><td>27 965</td><td>13,7</td></tr>
+      <tr><td>conversion-program</td><td>151</td><td>15 532</td><td>8,4</td></tr>
+      <tr><td>pilot-demand</td><td>142</td><td>28 627</td><td>9,5</td></tr>
+      <tr><td>helicopter professional program H</td><td>127</td><td>12 196</td><td>19,8</td></tr>
+      <tr><td>add-a-helicopter-rating</td><td>110</td><td>9 309</td><td>6,9</td></tr>
+      <tr><td>airplane private pilot</td><td>96</td><td>18 022</td><td>28,2</td></tr>
+      <tr><td>programs-courses</td><td>91</td><td>7 042</td><td>12,8</td></tr>
+      <tr><td>from-zero-to-cpl</td><td>82</td><td>9 063</td><td>9,3</td></tr>
+    </tbody>
+  </table>
+  <ul>
+    <li><b>International Students</b> первая страница услуг по кликам, 288 за квартал.</li>
+    <li><b>Helicopter Training</b> взят как направление, а не одна страница: вертолётные страницы вместе дают 237 кликов, и это единственное направление, где сайт стоит в топ-3 и попадает в AI-ответы.</li>
+    <li><b>Programs &amp; Courses</b> сам по себе даёт 91 клик, но это каталог, из которого расходятся все программы. Сейчас до него надо идти через раздел Training, то есть на два уровня вниз.</li>
+  </ul>
+  <p class="sm">Возможная альтернатива для обсуждения: если ставить строго по кликам, вместо каталога Programs &amp; Courses в тройку попадут Conversion Program (151) и Pilot Demand (142). Решение за клиентом, на вёрстку оно не влияет.</p>
+</div>
+
 <div class="open-new">Прототип меню отдельной страницей, удобно открыть на телефоне: <a href="new-menu.html">new-menu.html</a></div>
 
 <script>
@@ -75,7 +151,7 @@ function setMode(m){
     : 'Тот же контент и те же шрифты, цвета и таблицы сайта. Изменено только меню.';
   document.getElementById('hint').innerHTML = (m==='old')
     ? '<b>Что увидите.</b> Панель меню занимает 206px из 390px экрана, а сама ссылка внутри всего 102px. Слово Admissions в 102px не помещается, поэтому рвётся на Admissi и ons. В разделе Training подпункт How to Become a Commercial Pilot превращается в лесенку из слогов. Высота строки 26px при рекомендованных 44px. Цифры сняты замером на этом экране, это не оценка на глаз.'
-    : '<b>Что изменилось.</b> Меню занимает экран целиком, поэтому переносов по буквам нет в принципе: шрифт 16px, строка 54px, подпункт 48px. Добавлены поиск и кнопки Apply Now и WhatsApp, которых в мобильном меню не было вообще. Наверх вынесены три страницы, которые приносят заявки. Все 7 разделов и 30 подпунктов на месте, ссылки рабочие и ведут на настоящий сайт. Таблица прайса убрана в горизонтальный скролл, поэтому больше не растягивает страницу. Закрытие: крестик, тап по затемнению, клавиша Esc.';
+    : '<b>Что изменилось.</b> Меню занимает экран целиком, поэтому переносов по буквам нет в принципе: шрифт 16px, строка 54px, подпункт 48px. Добавлены поиск и кнопки Apply Now и WhatsApp, которых в мобильном меню не было вообще. Наверх вынесены три страницы, которые приносят заявки. Все 7 разделов и 27 подпунктов на месте, ссылки рабочие и ведут на настоящий сайт. Таблица прайса убрана в горизонтальный скролл, поэтому больше не растягивает страницу. Закрытие: крестик, тап по затемнению, клавиша Esc.';
 }
 setMode('new');
 if((location.hash||'').toLowerCase().indexOf('old')>-1) setMode('old');
